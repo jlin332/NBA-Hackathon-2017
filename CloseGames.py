@@ -30,8 +30,9 @@ if __name__ == '__main__':
             player9 = row[38]
             player10 = row[39]
             if (int(homePts) - int(visitorPts)) >= 20 or int(homePts) - int(visitorPts) <= -20:
-                games[game_id] = [period, player1, player2, player3,
-                                  player4, player5, player6, player7, player8, player9, player10]
+                if not game_id in games.keys():
+                    games[game_id] = [period, player1, player2, player3,
+                                    player4, player5, player6, player7, player8, player9, player10]
     # print games.keys()
     print games.__len__()
 
