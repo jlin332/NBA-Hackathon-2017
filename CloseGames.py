@@ -33,7 +33,7 @@ def closeGames(filename):
                 if not game_id in games.keys():
                     games[game_id] = [player1, player2, player3,
                                     player4, player5, player6, player7, player8, player9, player10]
-            return games
+        print games
 
 def countFactors(gameDic, filename):
     with open(filename, 'rU') as f:
