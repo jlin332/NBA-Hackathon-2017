@@ -1,5 +1,5 @@
 import csv
-
+from CloseGames import closeGames
 
 maxRate = 0
 homeMaxRate = 0
@@ -17,10 +17,9 @@ specificationDic = {
     'Highest_Rate_Visitor': 0,
 }
 
-shotDic = {}  # store shot value and general description
+filteredDic = {}
 
-
-def findGamewithRate(filename):
+def findGamewithRateFile(filename):
     with open(filename, 'rU') as f:
         reader = csv.reader(f, delimiter=",")
         row1 = next(reader)
@@ -115,6 +114,14 @@ def determineMax(homeMaxRate, homePlayClockTime, visitorMaxRate, visitorPlayCloc
         specDic['Highest_Rate_Visitor'] = visitorMaxRate
     return specDic
 
+def filterCloseGames(closeGames, rateGames):
+    for key in closeGames.keys():
+        if key in rateGames.keys():
+            spec = rateGames.get(key)
+            filteredDic[key] = spec
 
-findGamewithRate('Play_By_Play_New.csv')
-print rateDic
+
+findGamewithRateFile('Play_By_Play_New.csv')
+games = closeGames('Play_By_Play_New.csv')
+filterCloseGames(games, rateDic)
+print len(filteredDic)

@@ -1,6 +1,3 @@
-from collections import defaultdict
-from Queue import PriorityQueue
-from operator import itemgetter
 import csv
 
 # for this file, we want to find games whose score difference between 2 teams are <-2 or >20
@@ -65,9 +62,4 @@ def countFactors(gameDic, filename):
     return countDic
 
 if __name__ == '__main__':
-    closeGames('Play_by_Play_New.csv')
-    # print games.__len__()
-
-
-
-
+    games = closeGames('Play_by_Play_New.csv')
