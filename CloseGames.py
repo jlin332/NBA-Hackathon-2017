@@ -8,9 +8,9 @@ import csv
 
 
 if __name__ == '__main__':
-    games = {'gameID': 'periodNplayer'}
-    print "kim and xingxing best friends"
-
+    games = {'gameID': 'player'}
+    # this dictionary stores for last row
+    lastRow = {"id": "lastRowDiff"}
     with open('Play_by_Play_New.csv', 'rU') as f:
         reader = csv.reader(f, delimiter=",")
         next(reader)
@@ -29,11 +29,12 @@ if __name__ == '__main__':
             player8 = row[37]
             player9 = row[38]
             player10 = row[39]
-            if (int(homePts) - int(visitorPts)) >= 20 or int(homePts) - int(visitorPts) <= -20:
+            lastRow[game_id] = int(homePts) - int(visitorPts)
+            if (int(homePts) - int(visitorPts)
+                    == 10 or int(homePts) - int(visitorPts) == -10) and int(period) == 4 and lastRow[game_id] <= 2:
                 if not game_id in games.keys():
-                    games[game_id] = [period, player1, player2, player3,
+                    games[game_id] = [player1, player2, player3,
                                     player4, player5, player6, player7, player8, player9, player10]
-    # print games.keys()
     print games.__len__()
 
 
