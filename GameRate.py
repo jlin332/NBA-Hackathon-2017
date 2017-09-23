@@ -7,13 +7,17 @@ homePlayClockTime = 0
 visitorMaxRate = 0
 visitorPlayClockTime = 0
 
-rateDic = {} #store gameID as key and dictionary { attribute , value of attribute}
+rateDic = {}  # store gameID as key and dictionary { attribute , value of attribute}
+
+dicList = []
 specificationDic = {
+    'Max_Rate': 0,
     'Play_Clock_Time': 0,
     'Highest_Rate_Home': 0,
     'Highest_Rate_Visitor': 0,
 }
-shotDic = {}  #store shot value and general description
+
+shotDic = {}  # store shot value and general description
 
 
 def findGamewithRate(filename):
@@ -26,6 +30,7 @@ def findGamewithRate(filename):
         visitorPTSRow = 0
         descriptionRow = 0
         shotValueRow = 0
+        periodRow = 0
         counter = 0
         for attr in row1:
             if (attr == 'Game_id'):
@@ -40,26 +45,66 @@ def findGamewithRate(filename):
                 descriptionRow = counter
             elif (attr == 'Shot_Value'):
                 shotValueRow = counter
+            elif(attr == 'Period'):
+                periodRow = counter
             counter += 1
+        temp_game_id = 20700001
+        homeMaxRate = 0
+        visitorMaxRate = 0
+        homePlayClockTime = 0
+        visitorPlayClockTime = 0
         for row in reader:
-            game_id = row[gameIDRow]
-            playClockTime = row[playClockTimeRow]
-            homePTS = row[homePTSRow]
-            visitorPTS = row[visitorPTSRow]
-            description = row[descriptionRow]
-            shotValue = row[shotValueRow]
-            currentHomeRate = calculateRate(homePTS, playClockTime)
-            currentVistorRate = calculateRate(visitorPTS, playClockTime)
-            if (currentHomeRate > homeMaxRate):
-                homeMaxRate = currentHomeRate
-            if (currentVistorRate > visitorMaxRate):
-                visitorMaxRate = currentHomeRate
+            period = row[periodRow]
+            if (period == '4'):
+                game_id = row[gameIDRow]
+                playClockTime = row[playClockTimeRow]
+                homePTS = row[homePTSRow]
+                visitorPTS = row[visitorPTSRow]
+                description = row[descriptionRow]
+                shotValue = row[shotValueRow]
+                currentHomeRate = calculateRate(homePTS, playClockTime)
+                currentVistorRate = calculateRate(visitorPTS, playClockTime)
+                if (currentHomeRate > homeMaxRate):
+                    homeMaxRate = currentHomeRate
+                    homePlayClockTime = playClockTime
+                if (currentVistorRate > visitorMaxRate):
+                    visitorMaxRate = currentHomeRate
+                    visitorPlayClockTime = playClockTime
+                if (temp_game_id != game_id):
+                    rateDic[temp_game_id] = determineMax(homeMaxRate, homePlayClockTime, visitorMaxRate, visitorPlayClockTime)
+                    homeMaxRate = 0
+                    homePlayClockTime = 0
+                    visitorMaxRate = 0
+                    visitorPlayClockTime = 0
+                    maxRate = 0
+                temp_game_id = game_id
 
 
-def calculateRate(int score, int playClockTime):
-    int timeElapsed = 720 - playClockTime
-    float rate = score/playClockTime
+def calculateRate(score, playClockTime):
+    timeElapsed = 720 - int(float(playClockTime))
+    if (timeElapsed == 0):
+        return 0
+    else:
+        rate = int(score)/timeElapsed
     return rate
+
+def determineMax(homeMaxRate, homePlayClockTime, visitorMaxRate, visitorPlayClockTime):
+    specDic = dict()
+    if (homeMaxRate > visitorMaxRate):
+        specDic['PlayClockTime'] = homePlayClockTime
+        maxRate = homeMaxRate
+        specDic['Max_Rate'] = maxRate
+        specDic['Highest_Rate_Home'] = homeMaxRate
+        specDic['Highest_Rate_Visitor'] = visitorMaxRate
+    else:
+        specDic['PlayClockTime'] = visitorPlayClockTime
+        maxRate = visitorMaxRate
+        specDic['Max_Rate'] = maxRate
+        specDic['Highest_Rate_Home'] = homeMaxRate
+        specDic['Highest_Rate_Visitor'] = visitorMaxRate
+
+    return specDic
 
 
 findGamewithRate('Play_By_Play_New.csv')
+print rateDic
