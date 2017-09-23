@@ -39,12 +39,18 @@ def countFactors(gameDic, filename):
     with open(filename, 'rU') as f:
         reader = csv.reader(f, delimiter=",")
         next(reader)
+        countDic = {'gameID':'list: contains 4 counts'}
         jumpShot2_count = 0
         jumpShot3_count = 0
         timeOut_count = 0
         driving_count = 0
 
         for row in reader:
+            if row[0] not in countDic.keys():
+                jumpShot3_count = 0
+                jumpShot2_count = 0
+                timeOut_count = 0
+                driving_count = 0
             if row[0] in gameDic.keys() and int(row[11])== 4:
                 if (row[29] == 'Jump Shot: Made'):
                     if row[25] == 2:
@@ -55,7 +61,8 @@ def countFactors(gameDic, filename):
                     timeOut_count += 1
                 if row[29] == 'Driving Layup: Made':
                     driving_count += 1
-    return (jumpShot2_count, jumpShot3_count, timeOut_count, driving_count)
+                countDic[row[0]] = (jumpShot2_count, jumpShot3_count, timeOut_count, driving_count)
+    return countDic
 
 if __name__ == '__main__':
     closeGames('Play_by_Play_New.csv')
