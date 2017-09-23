@@ -53,6 +53,8 @@ def findGamewithRate(filename):
         visitorMaxRate = 0
         homePlayClockTime = 0
         visitorPlayClockTime = 0
+        initialHomeScore = 0
+        initialVisitorScore = 0
         for row in reader:
             period = row[periodRow]
             if (period == '4'):
@@ -62,8 +64,12 @@ def findGamewithRate(filename):
                 visitorPTS = row[visitorPTSRow]
                 description = row[descriptionRow]
                 shotValue = row[shotValueRow]
-                currentHomeRate = calculateRate(homePTS, playClockTime)
-                currentVistorRate = calculateRate(visitorPTS, playClockTime)
+                if (initialHomeScore == 0):
+                    initialHomeScore = homePTS
+                if (initialVisitorScore == 0):
+                    initialVisitorScore = visitorPTS
+                currentHomeRate = calculateRate(homePTS, initialHomeScore, playClockTime)
+                currentVistorRate = calculateRate(visitorPTS, initialVisitorScore, playClockTime)
                 if (currentHomeRate > homeMaxRate):
                     homeMaxRate = currentHomeRate
                     homePlayClockTime = playClockTime
@@ -77,16 +83,21 @@ def findGamewithRate(filename):
                     visitorMaxRate = 0
                     visitorPlayClockTime = 0
                     maxRate = 0
+                    initialHomeScore = 0
+                    initialVisitorScore = 0
                 temp_game_id = game_id
 
 
-def calculateRate(score, playClockTime):
+def calculateRate(score, initialScore, playClockTime):
     timeElapsed = 720 - int(float(playClockTime))
     if (timeElapsed == 0):
         return 0
     else:
-        rate = int(score)/timeElapsed
+        score = float(score)
+        initialScore = float(initialScore)
+        rate = (score - initialScore)/timeElapsed
     return rate
+
 
 def determineMax(homeMaxRate, homePlayClockTime, visitorMaxRate, visitorPlayClockTime):
     specDic = dict()
@@ -102,7 +113,6 @@ def determineMax(homeMaxRate, homePlayClockTime, visitorMaxRate, visitorPlayCloc
         specDic['Max_Rate'] = maxRate
         specDic['Highest_Rate_Home'] = homeMaxRate
         specDic['Highest_Rate_Visitor'] = visitorMaxRate
-
     return specDic
 
 
