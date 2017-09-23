@@ -35,6 +35,28 @@ def closeGames(filename):
                                     player4, player5, player6, player7, player8, player9, player10]
             return games
 
+def countFactors(gameDic, filename):
+    with open(filename, 'rU') as f:
+        reader = csv.reader(f, delimiter=",")
+        next(reader)
+        jumpShot2_count = 0
+        jumpShot3_count = 0
+        timeOut_count = 0
+        driving_count = 0
+
+        for row in reader:
+            if row[0] in gameDic.keys() and int(row[11])== 4:
+                if (row[29] == 'Jump Shot: Made'):
+                    if row[25] == 2:
+                        jumpShot2_count += 1
+                    else:
+                        jumpShot3_count += 1
+                if 'Timeout' in row[29]:
+                    timeOut_count += 1
+                if row[29] == 'Driving Layup: Made':
+                    driving_count += 1
+    return (jumpShot2_count, jumpShot3_count, timeOut_count, driving_count)
+
 if __name__ == '__main__':
     closeGames('Play_by_Play_New.csv')
     # print games.__len__()
