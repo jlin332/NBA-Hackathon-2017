@@ -5,13 +5,11 @@ import csv
 
 # for this file, we want to find games whose score difference between 2 teams are <-2 or >20
 # return game id, players, period
-
-
-if __name__ == '__main__':
+def closeGames(filename):
     games = {'gameID': 'player'}
     # this dictionary stores for last row
     lastRow = {"id": "lastRowDiff"}
-    with open('Play_by_Play_New.csv', 'rU') as f:
+    with open(filename, 'rU') as f:
         reader = csv.reader(f, delimiter=",")
         next(reader)
         for row in reader:
@@ -35,10 +33,11 @@ if __name__ == '__main__':
                 if not game_id in games.keys():
                     games[game_id] = [player1, player2, player3,
                                     player4, player5, player6, player7, player8, player9, player10]
-    print games.__len__()
+            return games
 
-
-
+if __name__ == '__main__':
+    closeGames('Play_by_Play_New.csv')
+    # print games.__len__()
 
 
 
