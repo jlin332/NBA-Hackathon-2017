@@ -50,6 +50,11 @@ def closeGames(filename):
         endVisitorScore = 0
         startTime = 0
         homeTeamID = 0
+        validGame = False
+        jumpShot2_count = 0
+        jumpShot3_count = 0
+        timeOut_count = 0
+        driving_count = 0
         for row in reader:
             period = row[periodRow]
             if (period == '4'):
@@ -70,33 +75,44 @@ def closeGames(filename):
                 player8 = row[37]
                 player9 = row[38]
                 player10 = row[39]
-                lastRow[game_id] = int(homePts) - int(visitorPts)
-                if (int(homePts) - int(visitorPts) == 10 and lastRow[game_id] <= 2):  # when the start of a run happens
-                    if not game_id in games.keys():
-                        catchingUpTeam = home_team_id
-                        startTime = playClockTime
-                        initialHomeScore = homePts
-                        games[game_id] = [player1, player2, player3,
+                if (validGame):
+                    if (row[29] == 'Jump Shot: Made'):
+                        if row[25] == '2':
+                            jumpShot2_count += 1
+                        else:
+                            jumpShot3_count += 1
+                    if 'Timeout' in row[29]:
+                        timeOut_count += 1
+                    if row[29] == 'Driving Layup: Made':
+                        driving_count += 1
+                if (int(homePts) - int(visitorPts) == 10 and not validGame and playClockTime != '0'):
+                    validGame = True
+                    catchingUpTeam = visitor_team_id
+                    startTime = playClockTime
+                    initialVisitorScore = visitorPts
+                elif ((int(homePts) - int(visitorPts) == -10) and not validGame and playClockTime != '0'):
+                    validGame = True
+                    catchingUpTeam = home_team_id
+                    startTime = playClockTime
+                    initialHomeScore = homePts
+                if (temp_game_id != game_id):
+                    pointDifference = int(endHomeScore) - int(endVisitorScore)
+                    if (pointDifference >= -2 and pointDifference <= 2 and validGame):
+                        games[temp_game_id] = [player1, player2, player3,
                             player4, player5, player6, player7, player8, player9, player10]
-                if ((int(homePts) - int(visitorPts) == -10) and lastRow[game_id] <= 2):  # when the start of a run happens
-                    if not game_id in games.keys():
-                        catchingUpTeam = visitor_team_id
-                        startTime = playClockTime
-                        initialVisitorScore = visitorPts
-                        games[game_id] = [player1, player2, player3,
-                            player4, player5, player6, player7, player8, player9, player10]
-                if (temp_game_id != game_id and temp_game_id in games.keys()):
-                    avgRate = calculateAvgRate(catchingUpTeam, startTime, initialHomeScore, initialVisitorScore, endHomeScore, endVisitorScore)
-                    avgRateDic[temp_game_id] = avgRate
-                    startTime = 0
+                        avgRate = calculateAvgRate(catchingUpTeam, startTime, initialHomeScore, initialVisitorScore, endHomeScore, endVisitorScore)
+                        avgRateDic[temp_game_id] = avgRate
                     initialHomeScore = 0
                     initialVisitorScore = 0
                     endHomeScore = 0
                     endVisitorScore = 0
+                    startTime = 0
+                    catchingUpTeam = 0
+                    validGame = False
                 temp_game_id = game_id
                 endHomeScore = homePts
                 endVisitorScore = visitorPts
-        return games
+    return (jumpShot2_count, jumpShot3_count, timeOut_count, driving_count)
 
 
 def calculateAvgRate(catchingUpTeam, startTime, initialHomeScore, initialVisitorScore, endHomeScore, endVisitorScore):
@@ -139,6 +155,3 @@ def countFactors(gameDic, filename):
 
 if __name__ == '__main__':
     games = closeGames('Play_by_Play_New.csv')
-    print avgRateDic
-    print len(avgRateDic)
-    print len(games)
